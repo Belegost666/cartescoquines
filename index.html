@@ -1,213 +1,337 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartes coquines</title>
-    <style>
-        :root {
-            --bg-color: #0d0d0d;
-            --card-bg: #1a1a1a;
-            --accent-color: #e60000;
-            --text-color: #f2f2f2;
-            --variant-color: #ffb3b3;
-            --gold: #c5a059;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --card-bg: #1a1a1a;
+    --gold: #c5a059;
+    --gold-dim: rgba(197,160,89,0.3);
+    --red: #e60000;
+    --pink: #ffb3b3;
+    --text: #f0ece4;
+    --muted: #666;
+  }
 
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
-            margin: 0;
-            padding: 15px;
-            text-align: center;
-        }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        h1 {
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            color: var(--gold);
-            opacity: 0.9;
-        }
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 24px 16px 32px;
+  }
 
-        #app-container {
-            width: 100%;
-            max-width: 340px; /* Largeur typique smartphone */
-        }
+  h1 {
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    color: var(--gold);
+    margin-bottom: 28px;
+    opacity: 0.85;
+  }
 
-        .card {
-            background-color: var(--card-bg);
-            border: 2px solid var(--gold); /* Bordure style Tarot */
-            border-radius: 15px;
-            padding: 25px;
-            aspect-ratio: 2 / 3.2; /* Ratio vertical Tarot */
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Centre le texte verticalement */
-            align-items: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-            background-image: linear-gradient(45deg, #1a1a1a 25%, #222 25%, #222 50%, #1a1a1a 50%, #1a1a1a 75%, #222 75%, #222 100%);
-            background-size: 40px 40px; /* Léger motif de fond */
-        }
+  #app {
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
 
-        /* Coins décoratifs */
-        .card::before {
-            content: '✦';
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: var(--gold);
-            font-size: 0.8rem;
-        }
+  .flip-wrap {
+    width: 100%;
+    aspect-ratio: 2 / 3.2;
+    perspective: 900px;
+    cursor: pointer;
+  }
 
-        .card::after {
-            content: '✦';
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            color: var(--gold);
-            font-size: 0.8rem;
-        }
+  .flip-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  }
 
-        .task-text {
-            font-size: 1.2rem;
-            line-height: 1.5;
-            margin-bottom: 0;
-            z-index: 1;
-        }
+  .flip-inner.flipped {
+    transform: rotateY(180deg);
+  }
 
-        .variant-container {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--gold);
-            color: var(--variant-color);
-            font-style: italic;
-            font-size: 0.95rem;
-            display: none; /* Apparaît au tirage */
-            z-index: 1;
-        }
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 14px;
+    border: 1.5px solid var(--gold);
+    background: var(--card-bg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 22px;
+  }
 
-        .number-highlight {
-            color: var(--accent-color);
-            font-weight: bold;
-            font-size: 1.4rem;
-            text-shadow: 0 0 10px rgba(230, 0, 0, 0.3);
-        }
+  .card-face::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(197,160,89,0.04) 39px, rgba(197,160,89,0.04) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(197,160,89,0.04) 39px, rgba(197,160,89,0.04) 40px);
+    pointer-events: none;
+  }
 
-        button {
-            background-color: var(--accent-color);
-            color: white;
-            border: 1px solid var(--gold);
-            border-radius: 8px;
-            padding: 16px 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            width: 100%;
-            box-shadow: 0 4px 15px rgba(230, 0, 0, 0.4);
-            transition: all 0.2s;
-        }
+  /* DOS */
+  .card-back { justify-content: center; }
 
-        button:active {
-            transform: scale(0.98);
-            background-color: #b30000;
-        }
+  .back-border {
+    position: absolute;
+    inset: 12px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    pointer-events: none;
+  }
 
-        .instruction {
-            font-size: 0.8rem;
-            color: #777;
-            margin-top: 15px;
-            font-style: italic;
-        }
-    </style>
+  .back-symbol {
+    font-size: 3rem;
+    color: var(--gold);
+    opacity: 0.18;
+    user-select: none;
+    line-height: 1;
+  }
+
+  .back-label {
+    font-size: 0.6rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.3;
+    font-family: 'Segoe UI', sans-serif;
+    margin-top: 10px;
+  }
+
+  /* FACE */
+  .card-front {
+    transform: rotateY(180deg);
+    padding: 22px 20px;
+  }
+
+  .corner {
+    position: absolute;
+    color: var(--gold);
+    font-size: 0.7rem;
+    opacity: 0.7;
+    line-height: 1;
+    user-select: none;
+  }
+  .corner.tl { top: 10px; left: 12px; }
+  .corner.tr { top: 10px; right: 12px; }
+  .corner.bl { bottom: 10px; left: 12px; }
+  .corner.br { bottom: 10px; right: 12px; }
+
+  .card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    z-index: 1;
+  }
+
+  .task-text {
+    font-size: 1.1rem;
+    line-height: 1.65;
+    text-align: center;
+    color: var(--text);
+  }
+
+  .number-highlight {
+    color: var(--red);
+    font-weight: bold;
+    font-size: 1.25em;
+  }
+
+  .variant-sep {
+    width: 40px;
+    height: 1px;
+    background: var(--gold-dim);
+    margin: 18px auto;
+    display: none;
+  }
+
+  .variant-text {
+    font-size: 0.82rem;
+    line-height: 1.55;
+    text-align: center;
+    color: var(--pink);
+    font-style: italic;
+    display: none;
+    opacity: 0.85;
+  }
+
+  .instruction {
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-style: italic;
+    text-align: center;
+    line-height: 1.5;
+  }
+</style>
 </head>
 <body>
 
-    <h1>Cartes coquines</h1>
+<h1>Cartes coquines</h1>
 
-    <div id="app-container">
-        <div class="card">
-            <div class="task-text" id="task-display">Tire une carte pour décider de son sort...</div>
-            <div class="variant-container" id="variant-display"></div>
+<div id="app">
+  <div class="flip-wrap" onclick="drawCard()">
+    <div class="flip-inner" id="flipper">
+
+      <div class="card-face card-back">
+        <div class="back-border"></div>
+        <div class="back-symbol">✦</div>
+        <div class="back-label">Cliquer pour tirer</div>
+      </div>
+
+      <div class="card-face card-front">
+        <span class="corner tl">✦</span>
+        <span class="corner tr">✦</span>
+        <span class="corner bl">✦</span>
+        <span class="corner br">✦</span>
+        <div class="card-content">
+          <p class="task-text" id="task-display"></p>
+          <div class="variant-sep" id="vsep"></div>
+          <p class="variant-text" id="variant-display"></p>
         </div>
+      </div>
 
-        <button onclick="getRandomTask()">Tirer une carte</button>
-        
-        <p class="instruction">Si la carte ne te convient pas, tire-en une nouvelle.</p>
     </div>
+  </div>
 
-    <script>
-        const tasks = [
-            { t: "Demande-lui de se masturber sans jouir pendant [5−20] minutes." },
-            { t: "Masturbe-le sans le laisser jouir pendant [5−20] minutes." },
-            { t: "Demande-lui de se faire jouir sans utiliser ses mains.", v: "Idée coquine : permets-lui de se frotter contre tes cuisses, tes fesses, tes pieds ou tes seins pour réussir." },
-            { t: "Demande-lui de se faire jouir seulement en se touchant les testicules." },
-            { t: "Fais-le jouir seulement en lui touchant les testicules." },
-            { t: "Attache-le en croix sur le lit, bande-lui les yeux puis masturbe-le sans le laisser jouir pendant [10−30] minutes.", v: "Idée coquine : fais-lui porter un plug anal ou un stimulateur prostatique." },
-            { t: "Demande-lui de jouir en moins de 30 secondes. S’il échoue, il devra attendre demain…", v: "Idée coquine : s’il échoue, il doit quand même continuer à se masturber pendant 5 minutes sans avoir le droit de jouir." },
-            { t: "Demande-lui de se faire jouir en moins de 10 minutes, mais il n’a pas le droit de toucher son sexe tant qu’il est en érection. Quand il bande, il se caresse partout sauf son sexe. Arrivera-t-il à jouir avec sa bite molle ? S’il échoue, il devra attendre demain…" },
-            { t: "Dis-lui que tu vas le caresser pour le faire jouir, mais que tu refuses de toucher son sexe tant qu’il est en érection. Quand il bande, caresse-le partout sauf son sexe. Arrivera-t-il à jouir avec sa bite molle ? S’il n’a pas joui au bout de 10 minutes, il devra attendre demain…" },
-            { t: "Dis-lui qu’il doit se masturber [5−20] minutes et qu’il pourra jouir à la fin... puis change d’avis au dernier moment : il devra attendre demain." },
-            { t: "Dis-lui que tu vas le masturber [5−20] minutes et qu’il pourra jouir à la fin... puis change d’avis juste avant la fin du chrono : il devra attendre demain." },
-            { t: "Demande-lui de se masturber 2 minutes. À la fin, lance une pièce. Pile : il continue 2 minutes et tu relances la pièce. Face : il arrête tout immédiatement.", v: "Idée coquine : lance la pièce sans lui montrer et décide toi-même si c’est pile ou face." },
-            { t: "Frappe-lui les fesses [10−30] fois." },
-            { t: "Frappe-lui le sexe et les testicules [10−30] fois." },
-            { t: "Demande-lui de jouir [2−3] fois de suite." },
-            { t: "Demande-lui de jouir [4−8] fois dans les prochaines 24 heures (il doit te rendre des comptes).", v: "Idée coquine : c’est toi qui lui imposes les moments où il doit jouir, tu peux même lui en demander plus que prévu." },
-            { t: "Pénètre-le avec un sextoy jusqu’à ce qu’il jouisse sans toucher son sexe." },
-            { t: "Demande-lui de se pénétrer avec un sextoy jusqu’à ce qu’il jouisse sans toucher son sexe." },
-            { t: "Attache-le, bande-lui les yeux, fais-le jouir une fois, et continue immédiatement jusqu’à ce qu’il jouisse une deuxième fois malgré la sensibilité.", v: "Idée coquine : fais-lui porter un plug anal ou un stimulateur prostatique." },
-            { t: "Demande-lui de porter une culotte de fille, puis caresse-le pour qu'il jouisse dedans, et ordonne-lui de la porter toute la nuit." },
-            { t: "Demande-lui de se mettre nu et d’avoir une érection. Puis demande-lui de te masser. Tant qu’il a une érection, il ne peut pas s’arrêter. S’il la perd, il peut s’arrêter, mais tu peux décider de lui redonner pour que le massage continue.", v: "Idée coquine : demande-lui de porter un cockring, de cette façon tu n’auras pas à t’inquiéter qu’il perde son érection." },
-            { t: "Suspends une clochette à ses testicules. Demande-lui de se masturber 10 minutes sans la faire sonner. S’il échoue 3 fois, il arrête. S’il réussit, il peut jouir, mais toujours sans faire sonner la cloche.", v: "Idée coquine : si tu veux le faire échouer, tu peux le bousculer ou le chatouiller pour faire sonner la cloche exprès." },
-            { t: "Dis-lui que s’il veut jouir demain soir il devra aller au travail avec une culotte de fille.", v: "Idée coquine : sois solidaire et porte un de ses caleçons toute la journée." },
-            { t: "Dis-lui que s’il veut jouir demain soir il devra passer toute la journée sans sous-vêtement.", v: "Idée coquine : sois solidaire et fais comme lui." },
-            { t: "Demande-lui de te faire jouir. Puis lance une pièce. Pile : il a le droit de jouir à son tour. Face : il attendra demain.", v: "Idée coquine : lance la pièce sans lui montrer et décide toi-même si c’est pile ou face." },
-            { t: "Demande-lui de te faire jouir. C’est tout, rien d’autre !" },
-            { t: "Dis-lui que c'est le hasard qui va décider de son sort, avec le jeu de l’As de cœur." },
-            { t: "Dis-lui que c'est le hasard qui va décider de son sort, avec le jeu du Blackjack." },
-            { t: "Lance un minuteur qu’il ne voit pas. Dis-lui qu’il doit se masturber pendant la durée que tu as choisi et qu’il doit jouir à la fin du chrono. À lui de deviner à quel moment il peut jouir. S’il jouit trop tôt, il devra continuer à se masturber jusqu’à la fin du chrono. S’il ne jouit pas avant la fin du chrono, il devra attendre demain…", v: "Idée coquine : donne-lui de fausses indications sur le temps restant pour l’inciter à jouir trop tôt où à dépasser le chrono…" },
-            { t: "Attache-le, bande-lui les yeux, lance un minuteur. Dis-lui que tu vas le masturber pendant la durée que tu as choisi et qu’il doit jouir à la fin du chrono. À lui de deviner à quel moment il peut jouir. S’il jouit trop tôt, tu continues à le masturber jusqu’à la fin du chrono. S’il ne jouit pas avant la fin du chrono, il devra attendre demain…", v: "Idée coquine : masturbe-le énergiquement pour le faire jouir rapidement et subir une longue torture post-orgasme. Au contraire, masturbe-le très lentement pour ne pas le laisser jouir." },
-            { t: "Attache-le en croix sur le lit, une barre entre les chevilles. Attache une corde autour de ces testicules et fixe-la corde solidement à la barre pour que son sexe soit bien dressé sans possibilité de bouger. Bande-lui les yeux puis caresse son sexe bien lubrifié avec seulement un doigt jusqu’à ce qu’il jouisse.", v: "Idée coquine : avant de le caresser prépare son sexe dressé avec quelques coups de cravache bien sentis." },
-            { t: "Lance un minuteur qu’il ne voit pas. Demande-lui de te faire jouir avant la fin du chrono. S’il réussit, il aura aussi le droit de jouir. S’il échoue, il devra te faire jouir quand même (faut pas déconner…) mais il ne pourra pas jouir ensuite.", v: "Idée coquine : si tu ne veux pas le laisser jouir, choisis une durée très courte. Au contraire, si tu veux le laisser jouir choisis une durée très longue." }
-        ];
+  <p class="instruction">Si la carte ne te convient pas, clique dessus pour en tirer une nouvelle.</p>
+</div>
 
-        function parseRandom(text) {
-            return text.replace(/\[(\d+)[−-](\d+)\]/g, function(match, min, max) {
-                const randomNum = Math.floor(Math.random() * (parseInt(max) - parseInt(min) + 1)) + parseInt(min);
-                return '<span class="number-highlight">' + randomNum + '</span>';
-            });
-        }
+<script>
+  const tasks = [
+    { t: "Demande-lui de se masturber sans jouir pendant [5−20] minutes." },
+    { t: "Masturbe-le sans le laisser jouir pendant [5−20] minutes." },
+    { t: "Demande-lui de se faire jouir sans utiliser ses mains.", v: "Idée coquine : permets-lui de se frotter contre tes cuisses, tes fesses, tes pieds ou tes seins pour réussir." },
+    { t: "Demande-lui de se faire jouir seulement en se touchant les testicules." },
+    { t: "Fais-le jouir seulement en lui touchant les testicules." },
+    { t: "Attache-le en croix sur le lit, bande-lui les yeux puis masturbe-le sans le laisser jouir pendant [10−30] minutes.", v: "Idée coquine : fais-lui porter un plug anal ou un stimulateur prostatique." },
+    { t: "Demande-lui de jouir en moins de 30 secondes. S'il échoue, il devra attendre demain…", v: "Idée coquine : s'il échoue, il doit quand même continuer à se masturber pendant 5 minutes sans avoir le droit de jouir." },
+    { t: "Demande-lui de se faire jouir en moins de 10 minutes, mais il n'a pas le droit de toucher son sexe tant qu'il est en érection. Quand il bande, il se caresse partout sauf son sexe. Arrivera-t-il à jouir avec sa bite molle ? S'il échoue, il devra attendre demain…" },
+    { t: "Dis-lui que tu vas le caresser pour le faire jouir, mais que tu refuses de toucher son sexe tant qu'il est en érection. Quand il bande, caresse-le partout sauf son sexe. Arrivera-t-il à jouir avec sa bite molle ? S'il n'a pas joui au bout de 10 minutes, il devra attendre demain…" },
+    { t: "Dis-lui qu'il doit se masturber [5−20] minutes et qu'il pourra jouir à la fin... puis change d'avis au dernier moment : il devra attendre demain." },
+    { t: "Dis-lui que tu vas le masturber [5−20] minutes et qu'il pourra jouir à la fin... puis change d'avis juste avant la fin du chrono : il devra attendre demain." },
+    { t: "Demande-lui de se masturber 2 minutes. À la fin, lance une pièce. Pile : il continue 2 minutes et tu relances la pièce. Face : il arrête tout immédiatement.", v: "Idée coquine : lance la pièce sans lui montrer et décide toi-même si c'est pile ou face." },
+    { t: "Frappe-lui les fesses [10−30] fois." },
+    { t: "Frappe-lui le sexe et les testicules [10−30] fois." },
+    { t: "Demande-lui de jouir [2−3] fois de suite." },
+    { t: "Demande-lui de jouir [4−8] fois dans les prochaines 24 heures (il doit te rendre des comptes).", v: "Idée coquine : c'est toi qui lui imposes les moments où il doit jouir, tu peux même lui en demander plus que prévu." },
+    { t: "Pénètre-le avec un sextoy jusqu'à ce qu'il jouisse sans toucher son sexe." },
+    { t: "Demande-lui de se pénétrer avec un sextoy jusqu'à ce qu'il jouisse sans toucher son sexe." },
+    { t: "Attache-le, bande-lui les yeux, fais-le jouir une fois, et continue immédiatement jusqu'à ce qu'il jouisse une deuxième fois malgré la sensibilité.", v: "Idée coquine : fais-lui porter un plug anal ou un stimulateur prostatique." },
+    { t: "Demande-lui de porter une culotte de fille, puis caresse-le pour qu'il jouisse dedans, et ordonne-lui de la porter toute la nuit." },
+    { t: "Demande-lui de se mettre nu et d'avoir une érection. Puis demande-lui de te masser. Tant qu'il a une érection, il ne peut pas s'arrêter. S'il la perd, il peut s'arrêter, mais tu peux décider de lui redonner pour que le massage continue.", v: "Idée coquine : demande-lui de porter un cockring, de cette façon tu n'auras pas à t'inquiéter qu'il perde son érection." },
+    { t: "Suspends une clochette à ses testicules. Demande-lui de se masturber 10 minutes sans la faire sonner. S'il échoue 3 fois, il arrête. S'il réussit, il peut jouir, mais toujours sans faire sonner la cloche.", v: "Idée coquine : si tu veux le faire échouer, tu peux le bousculer ou le chatouiller pour faire sonner la cloche exprès." },
+    { t: "Dis-lui que s'il veut jouir demain soir il devra aller au travail avec une culotte de fille.", v: "Idée coquine : sois solidaire et porte un de ses caleçons toute la journée." },
+    { t: "Dis-lui que s'il veut jouir demain soir il devra passer toute la journée sans sous-vêtement.", v: "Idée coquine : sois solidaire et fais comme lui." },
+    { t: "Demande-lui de te faire jouir. Puis lance une pièce. Pile : il a le droit de jouir à son tour. Face : il attendra demain.", v: "Idée coquine : lance la pièce sans lui montrer et décide toi-même si c'est pile ou face." },
+    { t: "Demande-lui de te faire jouir. C'est tout, rien d'autre !" },
+    { t: "Dis-lui que c'est le hasard qui va décider de son sort, avec le jeu de l'As de cœur." },
+    { t: "Dis-lui que c'est le hasard qui va décider de son sort, avec le jeu du Blackjack." },
+    { t: "Lance un minuteur qu'il ne voit pas. Dis-lui qu'il doit se masturber pendant la durée que tu as choisi et qu'il doit jouir à la fin du chrono. À lui de deviner à quel moment il peut jouir. S'il jouit trop tôt, il devra continuer à se masturber jusqu'à la fin du chrono. S'il ne jouit pas avant la fin du chrono, il devra attendre demain…", v: "Idée coquine : donne-lui de fausses indications sur le temps restant pour l'inciter à jouir trop tôt où à dépasser le chrono…" },
+    { t: "Attache-le, bande-lui les yeux, lance un minuteur. Dis-lui que tu vas le masturber pendant la durée que tu as choisi et qu'il doit jouir à la fin du chrono. À lui de deviner à quel moment il peut jouir. S'il jouit trop tôt, tu continues à le masturber jusqu'à la fin du chrono. S'il ne jouit pas avant la fin du chrono, il devra attendre demain…", v: "Idée coquine : masturbe-le énergiquement pour le faire jouir rapidement et subir une longue torture post-orgasme. Au contraire, masturbe-le très lentement pour ne pas le laisser jouir." },
+    { t: "Attache-le en croix sur le lit, une barre entre les chevilles. Attache une corde autour de ces testicules et fixe-la corde solidement à la barre pour que son sexe soit bien dressé sans possibilité de bouger. Bande-lui les yeux puis caresse son sexe bien lubrifié avec seulement un doigt jusqu'à ce qu'il jouisse.", v: "Idée coquine : avant de le caresser prépare son sexe dressé avec quelques coups de cravache bien sentis." },
+    { t: "Lance un minuteur qu'il ne voit pas. Demande-lui de te faire jouir avant la fin du chrono. S'il réussit, il aura aussi le droit de jouir. S'il échoue, il devra te faire jouir quand même (faut pas déconner…) mais il ne pourra pas jouir ensuite.", v: "Idée coquine : si tu ne veux pas le laisser jouir, choisis une durée très courte. Au contraire, si tu veux le laisser jouir choisis une durée très longue." }
+  ];
 
-        function getRandomTask() {
-            const display = document.getElementById('task-display');
-            const variantDisplay = document.getElementById('variant-display');
-            
-            const randomIndex = Math.floor(Math.random() * tasks.length);
-            const task = tasks[randomIndex];
-            
-            display.innerHTML = parseRandom(task.t);
-            
-            if (task.v) {
-                variantDisplay.innerHTML = parseRandom(task.v);
-                variantDisplay.style.display = 'block';
-            } else {
-                variantDisplay.style.display = 'none';
-            }
-        }
-    </script>
+  let isFlipped = false;
+  let isAnimating = false;
+  let lastIndex = -1;
+  let pendingTask = null;
+
+  function parseRandom(text) {
+    return text.replace(/\[(\d+)[−\-](\d+)\]/g, (_, min, max) => {
+      const n = Math.floor(Math.random() * (parseInt(max) - parseInt(min) + 1)) + parseInt(min);
+      return '<span class="number-highlight">' + n + '</span>';
+    });
+  }
+
+  function pickTask() {
+    let idx;
+    do { idx = Math.floor(Math.random() * tasks.length); } while (idx === lastIndex && tasks.length > 1);
+    lastIndex = idx;
+    return tasks[idx];
+  }
+
+  function applyTask(task) {
+    document.getElementById('task-display').innerHTML = parseRandom(task.t);
+    const vsep = document.getElementById('vsep');
+    const vd = document.getElementById('variant-display');
+    if (task.v) {
+      vd.innerHTML = parseRandom(task.v);
+      vd.style.display = 'block';
+      vsep.style.display = 'block';
+    } else {
+      vd.style.display = 'none';
+      vsep.style.display = 'none';
+    }
+  }
+
+  function drawCard() {
+    if (isAnimating) return;
+    const flipper = document.getElementById('flipper');
+    isAnimating = true;
+
+    if (!isFlipped) {
+      // Premier tirage : on prépare le contenu puis on flip vers la face
+      applyTask(pickTask());
+      flipper.classList.add('flipped');
+      isFlipped = true;
+      setTimeout(() => { isAnimating = false; }, 580);
+    } else {
+      // Nouvelle carte : on prépare le prochain contenu à mi-chemin
+      pendingTask = pickTask();
+      // On retire flipped pour revenir au dos (flip retour dans le même sens)
+      flipper.style.transition = 'none';
+      flipper.style.transform = 'rotateY(180deg)';
+      // On force un reflow puis on re-flip directement vers 360deg (= face, côté inverse)
+      void flipper.offsetWidth;
+      flipper.style.transition = 'transform 0.55s cubic-bezier(0.45, 0.05, 0.55, 0.95)';
+      flipper.style.transform = 'rotateY(360deg)';
+
+      // À mi-animation, on met à jour le contenu (carte cachée côté dos)
+      setTimeout(() => {
+        applyTask(pendingTask);
+      }, 270);
+
+      // Fin de l'animation : on remet les classes proprement
+      setTimeout(() => {
+        flipper.style.transition = 'none';
+        flipper.style.transform = '';
+        flipper.classList.add('flipped');
+        void flipper.offsetWidth;
+        flipper.style.transition = 'transform 0.55s cubic-bezier(0.45, 0.05, 0.55, 0.95)';
+        isAnimating = false;
+      }, 580);
+    }
+  }
+</script>
 </body>
 </html>
