@@ -539,20 +539,13 @@
 
   let browseIndex = 0;
 
-  function parseBrowse(text) {
-    // En consultation, on montre les plages sans les résoudre
-    return text.replace(/\[(\d+)[−\-](\d+)\]/g, (_, min, max) =>
-      '<span class="number-highlight">[' + min + '–' + max + ']</span>'
-    );
-  }
-
   function showBrowseCard() {
     const task = tasks[browseIndex];
-    document.getElementById('browse-task').innerHTML = parseBrowse(task.t);
+    document.getElementById('browse-task').innerHTML = parseRandom(task.t);
     const vsep = document.getElementById('browse-vsep');
     const vd   = document.getElementById('browse-variant');
     if (task.v) {
-      vd.innerHTML = parseBrowse(task.v);
+      vd.innerHTML = parseRandom(task.v);
       vd.style.display = 'block';
       vsep.style.display = 'block';
     } else {
