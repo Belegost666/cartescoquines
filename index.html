@@ -191,6 +191,164 @@
     text-align: center;
     line-height: 1.5;
   }
+
+  /* ───── MODE CONSULTATION (ajout) ───── */
+
+  .mode-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .mode-btn {
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .mode-btn.active {
+    background: var(--gold-dim);
+    color: var(--gold);
+  }
+
+  .mode-btn:first-child {
+    border-right: 1px solid var(--gold-dim);
+  }
+
+  /* Panneau de consultation */
+  #browse-panel {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  #browse-panel.visible {
+    display: flex;
+  }
+
+  /* Carte statique en mode consultation */
+  .browse-card {
+    width: 100%;
+    aspect-ratio: 2 / 3.2;
+    border-radius: 14px;
+    border: 1.5px solid var(--gold);
+    background: var(--card-bg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 22px 20px;
+    position: relative;
+  }
+
+  .browse-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(197,160,89,0.04) 39px, rgba(197,160,89,0.04) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(197,160,89,0.04) 39px, rgba(197,160,89,0.04) 40px);
+    pointer-events: none;
+  }
+
+  .browse-corner {
+    position: absolute;
+    color: var(--gold);
+    font-size: 0.7rem;
+    opacity: 0.7;
+    line-height: 1;
+    user-select: none;
+  }
+  .browse-corner.tl { top: 10px; left: 12px; }
+  .browse-corner.tr { top: 10px; right: 12px; }
+  .browse-corner.bl { bottom: 10px; left: 12px; }
+  .browse-corner.br { bottom: 10px; right: 12px; }
+
+  .browse-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    z-index: 1;
+    overflow-y: auto;
+  }
+
+  .browse-task-text {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    text-align: center;
+    color: var(--text);
+  }
+
+  .browse-variant-sep {
+    width: 40px;
+    height: 1px;
+    background: var(--gold-dim);
+    margin: 18px auto;
+    display: none;
+    flex-shrink: 0;
+  }
+
+  .browse-variant-text {
+    font-size: 0.82rem;
+    line-height: 1.55;
+    text-align: center;
+    color: var(--pink);
+    font-style: italic;
+    display: none;
+    opacity: 0.85;
+  }
+
+  /* Contrôles de navigation */
+  .browse-nav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .nav-btn {
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    width: 38px;
+    height: 38px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.18s;
+    user-select: none;
+  }
+
+  .nav-btn:hover { background: var(--gold-dim); }
+  .nav-btn:disabled { opacity: 0.22; cursor: default; }
+
+  .browse-counter {
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    min-width: 70px;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -198,31 +356,64 @@
 <h1>Cartes coquines</h1>
 
 <div id="app">
-  <div class="flip-wrap" onclick="drawCard()">
-    <div class="flip-inner" id="flipper">
 
-      <div class="card-face card-back">
-        <div class="back-border"></div>
-        <div class="back-symbol">✦</div>
-        <div class="back-label">Cliquer pour tirer</div>
-      </div>
-
-      <div class="card-face card-front">
-        <span class="corner tl">✦</span>
-        <span class="corner tr">✦</span>
-        <span class="corner bl">✦</span>
-        <span class="corner br">✦</span>
-        <div class="card-content">
-          <p class="task-text" id="task-display"></p>
-          <div class="variant-sep" id="vsep"></div>
-          <p class="variant-text" id="variant-display"></p>
-        </div>
-      </div>
-
-    </div>
+  <!-- ── Sélecteur de mode (ajout) ── -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btn-tirage" onclick="setMode('tirage')">Tirage</button>
+    <button class="mode-btn" id="btn-browse" onclick="setMode('browse')">Consultation</button>
   </div>
 
-  <p class="instruction">Si la carte ne te convient pas, clique dessus pour en tirer une nouvelle.</p>
+  <!-- ── Mode tirage (code original intact) ── -->
+  <div id="tirage-panel" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:18px;">
+    <div class="flip-wrap" onclick="drawCard()">
+      <div class="flip-inner" id="flipper">
+
+        <div class="card-face card-back">
+          <div class="back-border"></div>
+          <div class="back-symbol">✦</div>
+          <div class="back-label">Cliquer pour tirer</div>
+        </div>
+
+        <div class="card-face card-front">
+          <span class="corner tl">✦</span>
+          <span class="corner tr">✦</span>
+          <span class="corner bl">✦</span>
+          <span class="corner br">✦</span>
+          <div class="card-content">
+            <p class="task-text" id="task-display"></p>
+            <div class="variant-sep" id="vsep"></div>
+            <p class="variant-text" id="variant-display"></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <p class="instruction">Si la carte ne te convient pas, clique dessus pour en tirer une nouvelle.</p>
+  </div>
+
+  <!-- ── Mode consultation (ajout) ── -->
+  <div id="browse-panel">
+    <div class="browse-card">
+      <span class="browse-corner tl">✦</span>
+      <span class="browse-corner tr">✦</span>
+      <span class="browse-corner bl">✦</span>
+      <span class="browse-corner br">✦</span>
+      <div class="browse-card-content">
+        <p class="browse-task-text" id="browse-task"></p>
+        <div class="browse-variant-sep" id="browse-vsep"></div>
+        <p class="browse-variant-text" id="browse-variant"></p>
+      </div>
+    </div>
+
+    <div class="browse-nav">
+      <button class="nav-btn" id="nav-prev" onclick="browseStep(-1)" disabled>&#8592;</button>
+      <span class="browse-counter" id="browse-counter">1 / 40</span>
+      <button class="nav-btn" id="nav-next" onclick="browseStep(1)">&#8594;</button>
+    </div>
+
+    <p class="instruction">Parcours toutes les cartes dans l'ordre.</p>
+  </div>
+
 </div>
 
 <script>
@@ -269,6 +460,8 @@
     { t: "Ligote-lui les testicules et attache le lien à un point fixe ou à un poids. Demande-lui de se masturber pendant [10−20] minutes puis de ruiner son orgasme.", v: "Idée coquine : tire sur le lien pour lui compliquer la tâche." },
     { t: "Demande-lui de rester debout en érection le plus longtemps possible sans se toucher. Choisi une durée et lance un chrono secret. S'il y arrive, il peut jouir.", v: "Idée coquine : accroche un vêtement (ta culotte…) à son sexe, s'il tombe il a perdu."  }
   ];
+
+  // ─── Code original intact ───────────────────────────────────────────────────
 
   let isFlipped = false;
   let isAnimating = false;
@@ -339,6 +532,61 @@
         flipper.style.transition = 'transform 0.55s cubic-bezier(0.45, 0.05, 0.55, 0.95)';
         isAnimating = false;
       }, 580);
+    }
+  }
+
+  // ─── Mode consultation (ajout) ──────────────────────────────────────────────
+
+  let browseIndex = 0;
+
+  function parseBrowse(text) {
+    // En consultation, on montre les plages sans les résoudre
+    return text.replace(/\[(\d+)[−\-](\d+)\]/g, (_, min, max) =>
+      '<span class="number-highlight">[' + min + '–' + max + ']</span>'
+    );
+  }
+
+  function showBrowseCard() {
+    const task = tasks[browseIndex];
+    document.getElementById('browse-task').innerHTML = parseBrowse(task.t);
+    const vsep = document.getElementById('browse-vsep');
+    const vd   = document.getElementById('browse-variant');
+    if (task.v) {
+      vd.innerHTML = parseBrowse(task.v);
+      vd.style.display = 'block';
+      vsep.style.display = 'block';
+    } else {
+      vd.style.display = 'none';
+      vsep.style.display = 'none';
+    }
+    document.getElementById('browse-counter').textContent =
+      (browseIndex + 1) + ' / ' + tasks.length;
+    document.getElementById('nav-prev').disabled = browseIndex === 0;
+    document.getElementById('nav-next').disabled = browseIndex === tasks.length - 1;
+  }
+
+  function browseStep(dir) {
+    browseIndex = Math.max(0, Math.min(tasks.length - 1, browseIndex + dir));
+    showBrowseCard();
+  }
+
+  function setMode(mode) {
+    const tirage = document.getElementById('tirage-panel');
+    const browse = document.getElementById('browse-panel');
+    const btnT   = document.getElementById('btn-tirage');
+    const btnB   = document.getElementById('btn-browse');
+
+    if (mode === 'tirage') {
+      tirage.style.display = 'flex';
+      browse.classList.remove('visible');
+      btnT.classList.add('active');
+      btnB.classList.remove('active');
+    } else {
+      tirage.style.display = 'none';
+      browse.classList.add('visible');
+      btnB.classList.add('active');
+      btnT.classList.remove('active');
+      showBrowseCard();
     }
   }
 </script>
