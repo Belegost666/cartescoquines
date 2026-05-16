@@ -15,6 +15,7 @@
     --yellow: #ffed00;
     --text: #f0ece4;
     --muted: #666;
+    --surface: #222;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,7 +29,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 24px 16px 32px;
+    padding: 24px 16px 48px;
   }
 
   h1 {
@@ -66,9 +67,7 @@
     transition: transform 0.55s cubic-bezier(0.45, 0.05, 0.55, 0.95);
   }
 
-  .flip-inner.flipped {
-    transform: rotateY(180deg);
-  }
+  .flip-inner.flipped { transform: rotateY(180deg); }
 
   .card-face {
     position: absolute;
@@ -96,7 +95,6 @@
     pointer-events: none;
   }
 
-  /* DOS */
   .card-back { justify-content: center; }
 
   .back-border {
@@ -125,7 +123,6 @@
     margin-top: 10px;
   }
 
-  /* FACE */
   .card-front {
     transform: rotateY(180deg);
     padding: 22px 20px;
@@ -167,7 +164,7 @@
     font-size: 1.2em;
   }
 
-  .variant-sep {
+  .variant-sep, .infernal-sep {
     width: 40px;
     height: 1px;
     background: var(--gold-dim);
@@ -182,15 +179,6 @@
     color: var(--pink);
     font-style: italic;
     display: none;
-    opacity: 1;
-  }
-
-  .infernal-sep {
-    width: 40px;
-    height: 1px;
-    background: var(--gold-dim);
-    margin: 18px auto;
-    display: none;
   }
 
   .infernal-text {
@@ -200,7 +188,6 @@
     color: var(--yellow);
     font-style: italic;
     display: none;
-    opacity: 1;
   }
 
   .instruction {
@@ -211,8 +198,6 @@
     text-align: center;
     line-height: 1.5;
   }
-
-  /* ───── MODE CONSULTATION (ajout) ───── */
 
   .mode-toggle {
     display: flex;
@@ -231,7 +216,7 @@
     background: transparent;
     color: var(--muted);
     border: none;
-    padding: 7px 14px;
+    padding: 7px 12px;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
   }
@@ -241,11 +226,11 @@
     color: var(--gold);
   }
 
-  .mode-btn:first-child {
+  .mode-btn:not(:last-child) {
     border-right: 1px solid var(--gold-dim);
   }
 
-  /* Panneau de consultation */
+  /* ── MODE CONSULTATION ── */
   #browse-panel {
     display: none;
     width: 100%;
@@ -253,12 +238,8 @@
     align-items: center;
     gap: 14px;
   }
+  #browse-panel.visible { display: flex; }
 
-  #browse-panel.visible {
-    display: flex;
-  }
-
-  /* Carte statique en mode consultation */
   .browse-card {
     width: 100%;
     aspect-ratio: 2 / 3.2;
@@ -315,7 +296,7 @@
     color: var(--text);
   }
 
-  .browse-variant-sep {
+  .browse-variant-sep, .browse-isep {
     width: 40px;
     height: 1px;
     background: var(--gold-dim);
@@ -331,10 +312,8 @@
     color: var(--pink);
     font-style: italic;
     display: none;
-    opacity: 1;
   }
 
-  /* Contrôles de navigation */
   .browse-nav {
     display: flex;
     align-items: center;
@@ -369,6 +348,432 @@
     min-width: 70px;
     text-align: center;
   }
+
+  /* ── MODE SCÉNARIO ── */
+  #scenario-panel {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  #scenario-panel.visible { display: flex; }
+
+  .scenario-step {
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.7;
+    text-align: center;
+  }
+
+  /* Sélecteur de cartes */
+  #card-picker {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .picker-search {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    outline: none;
+  }
+
+  .picker-search::placeholder { color: var(--muted); }
+  .picker-search:focus { border-color: var(--gold); }
+
+  .picker-list {
+    width: 100%;
+    max-height: 240px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 4px;
+  }
+
+  .picker-list::-webkit-scrollbar { width: 4px; }
+  .picker-list::-webkit-scrollbar-track { background: transparent; }
+  .picker-list::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 4px; }
+
+  .picker-item {
+    background: var(--surface);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    user-select: none;
+  }
+
+  .picker-item:hover { border-color: var(--gold-dim); }
+
+  .picker-item.selected {
+    border-color: var(--gold);
+    background: rgba(197,160,89,0.08);
+  }
+
+  .picker-check {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--gold);
+    transition: background 0.18s;
+  }
+
+  .picker-item.selected .picker-check {
+    background: var(--gold);
+    color: #000;
+    border-color: var(--gold);
+  }
+
+  .picker-label {
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: var(--text);
+    opacity: 0.85;
+  }
+
+  .picker-label .number-highlight {
+    font-size: 0.78rem;
+  }
+
+  .picker-actions {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .btn-gold {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    color: var(--gold);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 9px 10px;
+    cursor: pointer;
+    transition: background 0.18s;
+  }
+
+  .btn-gold:hover { background: var(--gold-dim); }
+
+  .btn-gold.primary {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .btn-gold.primary:hover { background: rgba(197,160,89,0.45); }
+
+  .selection-count {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  .selection-count span {
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* Scénario en cours */
+  #scenario-runner {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  #scenario-runner.visible { display: flex; }
+
+  .scenario-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .scenario-progress {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .scenario-progress span {
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .btn-small {
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    border-radius: 6px;
+    color: var(--gold);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background 0.18s;
+    white-space: nowrap;
+  }
+
+  .btn-small:hover { background: var(--gold-dim); }
+
+  .progress-bar {
+    width: 100%;
+    height: 2px;
+    background: rgba(197,160,89,0.12);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* Carte scénario (mini + grand) */
+  .scenario-card {
+    width: 100%;
+    aspect-ratio: 2 / 3.2;
+    border-radius: 14px;
+    border: 1.5px solid var(--gold);
+    background: var(--card-bg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 22px 20px;
+    position: relative;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .scenario-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(197,160,89,0.04) 39px, rgba(197,160,89,0.04) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(197,160,89,0.04) 39px, rgba(197,160,89,0.04) 40px);
+    pointer-events: none;
+  }
+
+  .scenario-card.slide-out {
+    transform: translateX(-60px);
+    opacity: 0;
+  }
+
+  .scenario-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    z-index: 1;
+    overflow-y: auto;
+  }
+
+  .step-badge {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.58rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.5;
+    margin-bottom: 18px;
+  }
+
+  .scenario-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  /* Miniatures en bas */
+  .scenario-thumbs {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .scenario-thumbs::-webkit-scrollbar { height: 3px; }
+  .scenario-thumbs::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+  .thumb {
+    flex-shrink: 0;
+    width: 36px;
+    height: 52px;
+    border-radius: 6px;
+    border: 1.5px solid var(--gold-dim);
+    background: var(--card-bg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.6rem;
+    color: var(--muted);
+    transition: border-color 0.18s;
+    position: relative;
+    user-select: none;
+  }
+
+  .thumb.active {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .thumb.done {
+    opacity: 0.4;
+  }
+
+  .thumb-num {
+    font-size: 0.65rem;
+    color: inherit;
+  }
+
+  /* Réorganisation */
+  .reorder-area {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .reorder-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+
+  .drag-handle {
+    color: var(--muted);
+    font-size: 1rem;
+    cursor: grab;
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .drag-handle:active { cursor: grabbing; }
+
+  .reorder-text {
+    font-size: 0.75rem;
+    color: var(--text);
+    opacity: 0.8;
+    flex: 1;
+    line-height: 1.3;
+    pointer-events: none;
+  }
+
+  .reorder-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .reorder-btn {
+    background: transparent;
+    border: none;
+    color: var(--gold);
+    font-size: 0.7rem;
+    cursor: pointer;
+    padding: 0 4px;
+    opacity: 0.7;
+    line-height: 1.2;
+  }
+
+  .reorder-btn:hover { opacity: 1; }
+  .reorder-btn:disabled { opacity: 0.2; cursor: default; }
+
+  .reorder-delete {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0 4px;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+
+  .reorder-delete:hover { color: #e60000; }
+
+  /* Écran de fin */
+  #scenario-end {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+  }
+
+  #scenario-end.visible { display: flex; }
+
+  .end-symbol {
+    font-size: 3rem;
+    color: var(--gold);
+    opacity: 0.5;
+  }
+
+  .end-title {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.7;
+  }
+
+  .end-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.6;
+  }
 </style>
 </head>
 <body>
@@ -377,23 +782,21 @@
 
 <div id="app">
 
-  <!-- ── Sélecteur de mode (ajout) ── -->
   <div class="mode-toggle">
     <button class="mode-btn active" id="btn-tirage" onclick="setMode('tirage')">Tirage</button>
     <button class="mode-btn" id="btn-browse" onclick="setMode('browse')">Consultation</button>
+    <button class="mode-btn" id="btn-scenario" onclick="setMode('scenario')">Scénario</button>
   </div>
 
-  <!-- ── Mode tirage (code original intact) ── -->
+  <!-- ── MODE TIRAGE ── -->
   <div id="tirage-panel" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:18px;">
     <div class="flip-wrap" onclick="drawCard()">
       <div class="flip-inner" id="flipper">
-
         <div class="card-face card-back">
           <div class="back-border"></div>
           <div class="back-symbol">✦</div>
           <div class="back-label">Cliquer pour tirer</div>
         </div>
-
         <div class="card-face card-front">
           <span class="corner tl">✦</span>
           <span class="corner tr">✦</span>
@@ -407,13 +810,12 @@
             <p class="infernal-text" id="infernal-display"></p>
           </div>
         </div>
-
       </div>
     </div>
     <p class="instruction">Si la carte ne te convient pas, clique dessus pour en tirer une nouvelle.</p>
   </div>
 
-  <!-- ── Mode consultation (ajout) ── -->
+  <!-- ── MODE CONSULTATION ── -->
   <div id="browse-panel">
     <div class="browse-card">
       <span class="browse-corner tl">✦</span>
@@ -424,18 +826,84 @@
         <p class="browse-task-text" id="browse-task"></p>
         <div class="browse-variant-sep" id="browse-vsep"></div>
         <p class="browse-variant-text" id="browse-variant"></p>
-        <div class="infernal-sep" id="browse-isep"></div>
+        <div class="browse-isep" id="browse-isep"></div>
         <p class="infernal-text" id="browse-infernal"></p>
       </div>
     </div>
-
     <div class="browse-nav">
       <button class="nav-btn" id="nav-prev" onclick="browseStep(-1)" disabled>&#8592;</button>
-      <span class="browse-counter" id="browse-counter">1 / 40</span>
+      <span class="browse-counter" id="browse-counter">1 / 42</span>
       <button class="nav-btn" id="nav-next" onclick="browseStep(1)">&#8594;</button>
     </div>
-
     <p class="instruction">Parcours toutes les cartes dans l'ordre.</p>
+  </div>
+
+  <!-- ── MODE SCÉNARIO ── -->
+  <div id="scenario-panel">
+
+    <!-- Étape 1 : Sélection -->
+    <div id="scenario-step1" style="width:100%;display:flex;flex-direction:column;gap:12px;">
+      <p class="scenario-step">Étape 1 — Choisir les cartes</p>
+      <div id="card-picker">
+        <input type="text" class="picker-search" id="picker-search" placeholder="Rechercher une carte…" oninput="filterPicker()">
+        <div class="picker-list" id="picker-list"></div>
+      </div>
+      <p class="selection-count" id="selection-count"><span>0</span> carte(s) sélectionnée(s)</p>
+      <div class="picker-actions">
+        <button class="btn-gold" onclick="clearSelection()">Tout effacer</button>
+        <button class="btn-gold primary" onclick="goToStep2()" id="btn-step2" disabled>Suivant →</button>
+      </div>
+    </div>
+
+    <!-- Étape 2 : Réorganisation -->
+    <div id="scenario-step2" style="width:100%;display:none;flex-direction:column;gap:12px;">
+      <p class="scenario-step">Étape 2 — Ordonner le scénario</p>
+      <div class="reorder-area" id="reorder-list"></div>
+      <div class="picker-actions">
+        <button class="btn-gold" onclick="backToStep1()">← Modifier</button>
+        <button class="btn-gold primary" onclick="startScenario()">Commencer ✦</button>
+      </div>
+    </div>
+
+    <!-- Scénario en cours -->
+    <div id="scenario-runner">
+      <div class="scenario-header">
+        <p class="scenario-progress">Étape <span id="run-step">1</span> / <span id="run-total">0</span></p>
+        <button class="btn-small" onclick="exitScenario()">✕ Quitter</button>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="run-progress"></div></div>
+      <div class="scenario-card" id="run-card">
+        <span class="corner tl">✦</span>
+        <span class="corner tr">✦</span>
+        <span class="corner bl">✦</span>
+        <span class="corner br">✦</span>
+        <div class="scenario-card-content">
+          <p class="step-badge" id="run-badge">Carte 1</p>
+          <p class="task-text" id="run-task" style="text-align:center;"></p>
+          <div class="variant-sep" id="run-vsep"></div>
+          <p class="variant-text" id="run-variant"></p>
+          <div class="infernal-sep" id="run-isep"></div>
+          <p class="infernal-text" id="run-infernal"></p>
+        </div>
+      </div>
+      <div class="scenario-thumbs" id="run-thumbs"></div>
+      <div class="scenario-nav">
+        <button class="nav-btn" id="run-prev" onclick="scenarioStep(-1)" disabled>&#8592;</button>
+        <button class="btn-gold primary" style="flex:1;" onclick="scenarioStep(1)" id="run-next">Carte suivante →</button>
+      </div>
+    </div>
+
+    <!-- Fin du scénario -->
+    <div id="scenario-end">
+      <div class="end-symbol">✦</div>
+      <p class="end-title">Scénario terminé</p>
+      <p class="end-sub">Toutes les cartes ont été jouées.<br>Bonne soirée…</p>
+      <div class="picker-actions" style="width:100%;">
+        <button class="btn-gold" onclick="replayScenario()">Rejouer</button>
+        <button class="btn-gold primary" onclick="newScenario()">Nouveau scénario</button>
+      </div>
+    </div>
+
   </div>
 
 </div>
@@ -481,17 +949,12 @@
     { t: "Demande-lui de se mettre à genoux. Utilise une cravache sur ses fesses 10 fois avant de lui permettre de se masturber 1 min. Et ainsi de suite jusqu'à ce qu'il jouisse.", h: "Mode difficile : propose-lui de se masturber 2 min en échange de 20 coups de cravache, 3 min en échange de 30 coups…" },
     { t: "Lance deux dés. Le premier donne le nombre de minutes de masturbation. L'addition des deux dés donne le nombre de coups (fessée, sexe...) qu'il reçoit avant de pouvoir rejouer. Il ne peut jouir que si les deux dés affichent le même chiffre.", v: "Idée coquine : prévois à l'avance le nombre de lancés, si aucun double ne sort il jouira une prochaine fois." },
     { t: "Installe-le nu et en érection devant toi, puis dis-lui qu'il a 5 minutes pour perdre son érection s'il veut jouir ce soir. Si à la fin du temps il n'a pas réussi, il jouira une autre fois.", v: "Idée coquine : caresse-le partout (sauf son sexe) pour le faire échouer." },
-    { t: "Lance un dé. Le résultat détermine le nombre de jours pendant lesquels il doit se masturber 10 minutes tous les soirs sans jouir.", v: "Idée coquine : lance le dé sans lui montrer et décide toi-même du nombre de jours (6 maximum)." , h: "Mode difficile : propose-lui de relancer pour tenter d'obtenir un chiffre plus bas… mais dis-lui qu'en fait le nouveau résultat s'ajoute au premier." },
+    { t: "Lance un dé. Le résultat détermine le nombre de jours pendant lesquels il doit se masturber 10 minutes tous les soirs sans jouir.", v: "Idée coquine : lance le dé sans lui montrer et décide toi-même du nombre de jours (6 maximum).", h: "Mode difficile : propose-lui de relancer pour tenter d'obtenir un chiffre plus bas… mais dis-lui qu'en fait le nouveau résultat s'ajoute au premier." },
     { t: "Ligote-lui les testicules et attache le lien à un point fixe ou à un poids. Demande-lui de se masturber pendant [10−20] minutes puis de ruiner son orgasme.", v: "Idée coquine : tire sur le lien pour lui compliquer la tâche." },
     { t: "Demande-lui de rester debout en érection le plus longtemps possible sans se toucher. Choisi une durée et lance un chrono secret. S'il y arrive, il peut jouir.", v: "Idée coquine : accroche un vêtement (ta culotte…) à son sexe, s'il tombe il a perdu." }
   ];
 
-  // ─── Code original intact ───────────────────────────────────────────────────
-
-  let isFlipped = false;
-  let isAnimating = false;
-  let lastIndex = -1;
-  let pendingTask = null;
+  // ─── HELPERS ───────────────────────────────────────────────────────────────
 
   function parseRandom(text) {
     return text.replace(/\[(\d+)[−\-](\d+)\]/g, (_, min, max) => {
@@ -500,6 +963,19 @@
     });
   }
 
+  function stripTags(html) {
+    return html.replace(/<[^>]*>/g, '');
+  }
+
+  function shortLabel(t) {
+    const clean = t.replace(/\[(\d+)[−\-](\d+)\]/g, '…');
+    return clean.length > 55 ? clean.slice(0, 55) + '…' : clean;
+  }
+
+  // ─── MODE TIRAGE ────────────────────────────────────────────────────────────
+
+  let isFlipped = false, isAnimating = false, lastIndex = -1, pendingTask = null;
+
   function pickTask() {
     let idx;
     do { idx = Math.floor(Math.random() * tasks.length); } while (idx === lastIndex && tasks.length > 1);
@@ -507,35 +983,23 @@
     return tasks[idx];
   }
 
-  function applyTask(task) {
-    document.getElementById('task-display').innerHTML = parseRandom(task.t);
-    const vsep = document.getElementById('vsep');
-    const vd = document.getElementById('variant-display');
-    if (task.v) {
-      vd.innerHTML = parseRandom(task.v);
-      vd.style.display = 'block';
-      vsep.style.display = 'block';
-    } else {
-      vd.style.display = 'none';
-      vsep.style.display = 'none';
-    }
-    const isep = document.getElementById('isep');
-    const id   = document.getElementById('infernal-display');
-    if (task.h) {
-      id.innerHTML = task.h;
-      id.style.display = 'block';
-      isep.style.display = 'block';
-    } else {
-      id.style.display = 'none';
-      isep.style.display = 'none';
-    }
+  function applyTask(task, prefix) {
+    prefix = prefix || '';
+    document.getElementById(prefix + 'task-display').innerHTML = parseRandom(task.t);
+    const vsep = document.getElementById(prefix + 'vsep');
+    const vd   = document.getElementById(prefix + 'variant-display');
+    if (task.v) { vd.innerHTML = parseRandom(task.v); vd.style.display = 'block'; vsep.style.display = 'block'; }
+    else { vd.style.display = 'none'; vsep.style.display = 'none'; }
+    const isep = document.getElementById(prefix + 'isep');
+    const id   = document.getElementById(prefix + 'infernal-display');
+    if (task.h) { id.innerHTML = task.h; id.style.display = 'block'; isep.style.display = 'block'; }
+    else { id.style.display = 'none'; isep.style.display = 'none'; }
   }
 
   function drawCard() {
     if (isAnimating) return;
     const flipper = document.getElementById('flipper');
     isAnimating = true;
-
     if (!isFlipped) {
       applyTask(pickTask());
       flipper.classList.add('flipped');
@@ -546,25 +1010,21 @@
       flipper.style.transition = 'none';
       flipper.style.transform = 'rotateY(180deg)';
       void flipper.offsetWidth;
-      flipper.style.transition = 'transform 0.55s cubic-bezier(0.45, 0.05, 0.55, 0.95)';
+      flipper.style.transition = 'transform 0.55s cubic-bezier(0.45,0.05,0.55,0.95)';
       flipper.style.transform = 'rotateY(360deg)';
-
-      setTimeout(() => {
-        applyTask(pendingTask);
-      }, 270);
-
+      setTimeout(() => { applyTask(pendingTask); }, 270);
       setTimeout(() => {
         flipper.style.transition = 'none';
         flipper.style.transform = '';
         flipper.classList.add('flipped');
         void flipper.offsetWidth;
-        flipper.style.transition = 'transform 0.55s cubic-bezier(0.45, 0.05, 0.55, 0.95)';
+        flipper.style.transition = 'transform 0.55s cubic-bezier(0.45,0.05,0.55,0.95)';
         isAnimating = false;
       }, 580);
     }
   }
 
-  // ─── Mode consultation (ajout) ──────────────────────────────────────────────
+  // ─── MODE CONSULTATION ──────────────────────────────────────────────────────
 
   let browseIndex = 0;
 
@@ -573,26 +1033,13 @@
     document.getElementById('browse-task').innerHTML = parseRandom(task.t);
     const vsep = document.getElementById('browse-vsep');
     const vd   = document.getElementById('browse-variant');
-    if (task.v) {
-      vd.innerHTML = parseRandom(task.v);
-      vd.style.display = 'block';
-      vsep.style.display = 'block';
-    } else {
-      vd.style.display = 'none';
-      vsep.style.display = 'none';
-    }
+    if (task.v) { vd.innerHTML = parseRandom(task.v); vd.style.display = 'block'; vsep.style.display = 'block'; }
+    else { vd.style.display = 'none'; vsep.style.display = 'none'; }
     const bisep = document.getElementById('browse-isep');
     const bid   = document.getElementById('browse-infernal');
-    if (task.h) {
-      bid.innerHTML = task.h;
-      bid.style.display = 'block';
-      bisep.style.display = 'block';
-    } else {
-      bid.style.display = 'none';
-      bisep.style.display = 'none';
-    }
-    document.getElementById('browse-counter').textContent =
-      (browseIndex + 1) + ' / ' + tasks.length;
+    if (task.h) { bid.innerHTML = task.h; bid.style.display = 'block'; bisep.style.display = 'block'; }
+    else { bid.style.display = 'none'; bisep.style.display = 'none'; }
+    document.getElementById('browse-counter').textContent = (browseIndex + 1) + ' / ' + tasks.length;
     document.getElementById('nav-prev').disabled = browseIndex === 0;
     document.getElementById('nav-next').disabled = browseIndex === tasks.length - 1;
   }
@@ -602,25 +1049,225 @@
     showBrowseCard();
   }
 
-  function setMode(mode) {
-    const tirage = document.getElementById('tirage-panel');
-    const browse = document.getElementById('browse-panel');
-    const btnT   = document.getElementById('btn-tirage');
-    const btnB   = document.getElementById('btn-browse');
+  // ─── MODE SCÉNARIO — SÉLECTION ──────────────────────────────────────────────
 
-    if (mode === 'tirage') {
-      tirage.style.display = 'flex';
-      browse.classList.remove('visible');
-      btnT.classList.add('active');
-      btnB.classList.remove('active');
-    } else {
-      tirage.style.display = 'none';
-      browse.classList.add('visible');
-      btnB.classList.add('active');
-      btnT.classList.remove('active');
-      showBrowseCard();
-    }
+  let selectedIndices = [];
+
+  function initPicker() {
+    renderPickerList('');
   }
+
+  function renderPickerList(query) {
+    const list = document.getElementById('picker-list');
+    list.innerHTML = '';
+    tasks.forEach((task, i) => {
+      const label = shortLabel(task.t);
+      if (query && !label.toLowerCase().includes(query.toLowerCase())) return;
+      const item = document.createElement('div');
+      item.className = 'picker-item' + (selectedIndices.includes(i) ? ' selected' : '');
+      item.innerHTML =
+        '<div class="picker-check">' + (selectedIndices.includes(i) ? '✓' : '') + '</div>' +
+        '<span class="picker-label">' + label + '</span>';
+      item.onclick = () => toggleCard(i);
+      item.dataset.idx = i;
+      list.appendChild(item);
+    });
+  }
+
+  function filterPicker() {
+    renderPickerList(document.getElementById('picker-search').value);
+  }
+
+  function toggleCard(idx) {
+    const pos = selectedIndices.indexOf(idx);
+    if (pos === -1) selectedIndices.push(idx);
+    else selectedIndices.splice(pos, 1);
+    renderPickerList(document.getElementById('picker-search').value);
+    updateSelectionCount();
+  }
+
+  function updateSelectionCount() {
+    const n = selectedIndices.length;
+    document.getElementById('selection-count').innerHTML = '<span>' + n + '</span> carte(s) sélectionnée(s)';
+    document.getElementById('btn-step2').disabled = n < 1;
+  }
+
+  function clearSelection() {
+    selectedIndices = [];
+    renderPickerList(document.getElementById('picker-search').value);
+    updateSelectionCount();
+  }
+
+  // ─── ÉTAPE 2 : RÉORGANISATION ───────────────────────────────────────────────
+
+  let scenarioOrder = [];
+
+  function goToStep2() {
+    scenarioOrder = [...selectedIndices];
+    document.getElementById('scenario-step1').style.display = 'none';
+    document.getElementById('scenario-step2').style.display = 'flex';
+    renderReorderList();
+  }
+
+  function backToStep1() {
+    document.getElementById('scenario-step1').style.display = 'flex';
+    document.getElementById('scenario-step2').style.display = 'none';
+  }
+
+  function renderReorderList() {
+    const list = document.getElementById('reorder-list');
+    list.innerHTML = '';
+    scenarioOrder.forEach((taskIdx, pos) => {
+      const task = tasks[taskIdx];
+      const item = document.createElement('div');
+      item.className = 'reorder-item';
+      item.dataset.pos = pos;
+      item.innerHTML =
+        '<span class="drag-handle" aria-hidden="true">⠿</span>' +
+        '<span class="reorder-text">' + shortLabel(task.t) + '</span>' +
+        '<div class="reorder-btns">' +
+          '<button class="reorder-btn" onclick="moveItem(' + pos + ',-1)"' + (pos === 0 ? ' disabled' : '') + '>▲</button>' +
+          '<button class="reorder-btn" onclick="moveItem(' + pos + ',1)"' + (pos === scenarioOrder.length - 1 ? ' disabled' : '') + '>▼</button>' +
+        '</div>' +
+        '<button class="reorder-delete" onclick="removeItem(' + pos + ')" title="Supprimer">✕</button>';
+      list.appendChild(item);
+    });
+  }
+
+  function moveItem(pos, dir) {
+    const newPos = pos + dir;
+    if (newPos < 0 || newPos >= scenarioOrder.length) return;
+    [scenarioOrder[pos], scenarioOrder[newPos]] = [scenarioOrder[newPos], scenarioOrder[pos]];
+    renderReorderList();
+  }
+
+  function removeItem(pos) {
+    scenarioOrder.splice(pos, 1);
+    if (scenarioOrder.length === 0) { backToStep1(); return; }
+    renderReorderList();
+  }
+
+  // ─── SCÉNARIO EN COURS ──────────────────────────────────────────────────────
+
+  let runIndex = 0;
+
+  function startScenario() {
+    runIndex = 0;
+    document.getElementById('scenario-step2').style.display = 'none';
+    document.getElementById('scenario-runner').classList.add('visible');
+    document.getElementById('run-total').textContent = scenarioOrder.length;
+    renderRunCard();
+    renderThumbs();
+  }
+
+  function renderRunCard() {
+    const taskIdx = scenarioOrder[runIndex];
+    const task    = tasks[taskIdx];
+    const total   = scenarioOrder.length;
+
+    document.getElementById('run-badge').textContent = 'Carte ' + (runIndex + 1);
+    document.getElementById('run-step').textContent  = runIndex + 1;
+    document.getElementById('run-task').innerHTML    = parseRandom(task.t);
+
+    const vsep = document.getElementById('run-vsep');
+    const vd   = document.getElementById('run-variant');
+    if (task.v) { vd.innerHTML = parseRandom(task.v); vd.style.display = 'block'; vsep.style.display = 'block'; }
+    else { vd.style.display = 'none'; vsep.style.display = 'none'; }
+
+    const isep = document.getElementById('run-isep');
+    const id   = document.getElementById('run-infernal');
+    if (task.h) { id.innerHTML = task.h; id.style.display = 'block'; isep.style.display = 'block'; }
+    else { id.style.display = 'none'; isep.style.display = 'none'; }
+
+    const pct = ((runIndex + 1) / total) * 100;
+    document.getElementById('run-progress').style.width = pct + '%';
+
+    document.getElementById('run-prev').disabled = runIndex === 0;
+    const nextBtn = document.getElementById('run-next');
+    if (runIndex === total - 1) {
+      nextBtn.textContent = 'Terminer ✦';
+    } else {
+      nextBtn.textContent = 'Carte suivante →';
+    }
+
+    renderThumbs();
+  }
+
+  function renderThumbs() {
+    const thumbs = document.getElementById('run-thumbs');
+    thumbs.innerHTML = '';
+    scenarioOrder.forEach((_, pos) => {
+      const t = document.createElement('div');
+      t.className = 'thumb' + (pos === runIndex ? ' active' : '') + (pos < runIndex ? ' done' : '');
+      t.innerHTML = '<span class="thumb-num">' + (pos + 1) + '</span>';
+      t.onclick = () => { runIndex = pos; renderRunCard(); };
+      thumbs.appendChild(t);
+    });
+    // scroll active thumb into view
+    const activeThumb = thumbs.children[runIndex];
+    if (activeThumb) activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
+
+  function scenarioStep(dir) {
+    if (dir === 1 && runIndex === scenarioOrder.length - 1) {
+      endScenario();
+      return;
+    }
+    const card = document.getElementById('run-card');
+    card.classList.add('slide-out');
+    setTimeout(() => {
+      runIndex = Math.max(0, Math.min(scenarioOrder.length - 1, runIndex + dir));
+      card.classList.remove('slide-out');
+      renderRunCard();
+    }, 260);
+  }
+
+  function endScenario() {
+    document.getElementById('scenario-runner').classList.remove('visible');
+    document.getElementById('scenario-end').classList.add('visible');
+  }
+
+  function replayScenario() {
+    document.getElementById('scenario-end').classList.remove('visible');
+    runIndex = 0;
+    document.getElementById('scenario-runner').classList.add('visible');
+    renderRunCard();
+    renderThumbs();
+  }
+
+  function newScenario() {
+    document.getElementById('scenario-end').classList.remove('visible');
+    selectedIndices = [];
+    scenarioOrder = [];
+    renderPickerList('');
+    updateSelectionCount();
+    document.getElementById('picker-search').value = '';
+    document.getElementById('scenario-step1').style.display = 'flex';
+  }
+
+  function exitScenario() {
+    document.getElementById('scenario-runner').classList.remove('visible');
+    document.getElementById('scenario-step2').style.display = 'flex';
+  }
+
+  // ─── MODE SWITCHER ──────────────────────────────────────────────────────────
+
+  function setMode(mode) {
+    const tirage   = document.getElementById('tirage-panel');
+    const browse   = document.getElementById('browse-panel');
+    const scenario = document.getElementById('scenario-panel');
+    ['tirage','browse','scenario'].forEach(m => {
+      document.getElementById('btn-' + m).classList.remove('active');
+    });
+    document.getElementById('btn-' + mode).classList.add('active');
+    tirage.style.display   = mode === 'tirage'   ? 'flex' : 'none';
+    browse.classList.toggle('visible', mode === 'browse');
+    scenario.classList.toggle('visible', mode === 'scenario');
+    if (mode === 'browse') showBrowseCard();
+  }
+
+  // ─── INIT ───────────────────────────────────────────────────────────────────
+  initPicker();
 </script>
 </body>
 </html>
