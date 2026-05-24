@@ -452,6 +452,7 @@
     line-height: 1.4;
     color: var(--text);
     opacity: 0.85;
+    flex: 1;
   }
 
   .picker-label .number-highlight {
@@ -774,6 +775,117 @@
     font-style: italic;
     line-height: 1.6;
   }
+
+  /* ── MODE CHOIX ── */
+  #choix-panel {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+  #choix-panel.visible { display: flex; }
+
+  .choix-card {
+    width: 100%;
+    aspect-ratio: 2 / 3.2;
+    border-radius: 14px;
+    border: 1.5px solid var(--gold);
+    background: var(--card-bg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 22px 20px;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    user-select: none;
+  }
+
+  .choix-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(197,160,89,0.04) 39px, rgba(197,160,89,0.04) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(197,160,89,0.04) 39px, rgba(197,160,89,0.04) 40px);
+    pointer-events: none;
+  }
+
+  .choix-card:hover { border-color: rgba(197,160,89,0.8); transform: scale(1.01); }
+
+  .choix-card.chosen {
+    border-color: var(--gold);
+    border-width: 2.5px;
+    box-shadow: 0 0 0 1px var(--gold-dim);
+  }
+
+  .choix-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    z-index: 1;
+    overflow-y: auto;
+  }
+
+  .choix-counter {
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.5;
+    margin-bottom: 16px;
+  }
+
+  .choix-nav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .choix-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .choix-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-dim);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s;
+  }
+
+  .choix-dot.active { background: var(--gold); border-color: var(--gold); }
+  .choix-dot.chosen-dot { border-color: var(--gold); background: rgba(197,160,89,0.4); }
+
+  #choix-chosen-panel {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+  #choix-chosen-panel.visible { display: flex; }
+
+  .chosen-label {
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.6;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -784,6 +896,7 @@
 
   <div class="mode-toggle">
     <button class="mode-btn active" id="btn-tirage" onclick="setMode('tirage')">Tirage</button>
+    <button class="mode-btn" id="btn-choix" onclick="setMode('choix')">Choix</button>
     <button class="mode-btn" id="btn-browse" onclick="setMode('browse')">Consultation</button>
     <button class="mode-btn" id="btn-scenario" onclick="setMode('scenario')">Scénario</button>
   </div>
@@ -813,6 +926,58 @@
       </div>
     </div>
     <p class="instruction">Si la carte ne te convient pas, clique dessus pour en tirer une nouvelle.</p>
+  </div>
+
+  <!-- ── MODE CHOIX ── -->
+  <div id="choix-panel">
+
+    <!-- Sélection parmi les 3 cartes -->
+    <div id="choix-picker" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:18px;">
+      <div class="choix-card" id="choix-card-display" onclick="choixNext()">
+        <span class="corner tl">✦</span>
+        <span class="corner tr">✦</span>
+        <span class="corner bl">✦</span>
+        <span class="corner br">✦</span>
+        <div class="choix-card-content">
+          <p class="choix-counter" id="choix-counter">Carte 1 / 3</p>
+          <p class="task-text" id="choix-task"></p>
+          <div class="variant-sep" id="choix-vsep"></div>
+          <p class="variant-text" id="choix-variant"></p>
+          <div class="infernal-sep" id="choix-isep"></div>
+          <p class="infernal-text" id="choix-infernal"></p>
+        </div>
+      </div>
+      <div class="choix-nav">
+        <button class="nav-btn" id="choix-prev-btn" onclick="choixGo(-1)" disabled>&#8592;</button>
+        <div class="choix-dots" id="choix-dots"></div>
+        <button class="nav-btn" id="choix-next-btn" onclick="choixGo(1)">&#8594;</button>
+      </div>
+      <div style="display:flex;gap:8px;width:100%;">
+        <button class="btn-gold" onclick="initChoix()">✦ Nouvelles cartes</button>
+        <button class="btn-gold primary" onclick="choixChoisir()">Choisir cette carte</button>
+      </div>
+      <p class="instruction">Parcours les 3 cartes et choisis celle que tu préfères.</p>
+    </div>
+
+    <!-- Carte choisie -->
+    <div id="choix-chosen-panel">
+      <p class="chosen-label">Carte choisie</p>
+      <div class="choix-card chosen" style="cursor:default;">
+        <span class="corner tl">✦</span>
+        <span class="corner tr">✦</span>
+        <span class="corner bl">✦</span>
+        <span class="corner br">✦</span>
+        <div class="choix-card-content">
+          <p class="task-text" id="chosen-task"></p>
+          <div class="variant-sep" id="chosen-vsep"></div>
+          <p class="variant-text" id="chosen-variant"></p>
+          <div class="infernal-sep" id="chosen-isep"></div>
+          <p class="infernal-text" id="chosen-infernal"></p>
+        </div>
+      </div>
+      <button class="btn-gold primary" style="width:100%;" onclick="initChoix(); document.getElementById('choix-chosen-panel').classList.remove('visible'); document.getElementById('choix-picker').style.display='flex';">✦ Nouveau tirage</button>
+    </div>
+
   </div>
 
   <!-- ── MODE CONSULTATION ── -->
@@ -1057,6 +1222,79 @@
     showBrowseCard();
   }
 
+  // ─── MODE CHOIX ─────────────────────────────────────────────────────────────
+
+  let choixCards = [];
+  let choixIndex = 0;
+
+  function initChoix() {
+    // Tire 3 cartes sans répétition
+    const indices = [];
+    while (indices.length < 3) {
+      const idx = Math.floor(Math.random() * tasks.length);
+      if (!indices.includes(idx)) indices.push(idx);
+    }
+    choixCards = indices.map(i => tasks[i]);
+    choixIndex = 0;
+    renderChoixCard();
+    renderChoixDots();
+  }
+
+  function renderChoixCard() {
+    const task = choixCards[choixIndex];
+    document.getElementById('choix-counter').textContent = 'Carte ' + (choixIndex + 1) + ' / 3';
+    document.getElementById('choix-task').innerHTML = parseRandom(task.t);
+    const vsep = document.getElementById('choix-vsep');
+    const vd   = document.getElementById('choix-variant');
+    if (task.v) { vd.innerHTML = parseRandom(task.v); vd.style.display = 'block'; vsep.style.display = 'block'; }
+    else { vd.style.display = 'none'; vsep.style.display = 'none'; }
+    const isep = document.getElementById('choix-isep');
+    const id   = document.getElementById('choix-infernal');
+    if (task.h) { id.innerHTML = task.h; id.style.display = 'block'; isep.style.display = 'block'; }
+    else { id.style.display = 'none'; isep.style.display = 'none'; }
+    document.getElementById('choix-prev-btn').disabled = choixIndex === 0;
+    document.getElementById('choix-next-btn').disabled = choixIndex === 2;
+  }
+
+  function renderChoixDots() {
+    const dots = document.getElementById('choix-dots');
+    dots.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+      const d = document.createElement('div');
+      d.className = 'choix-dot' + (i === choixIndex ? ' active' : '');
+      d.onclick = (function(idx) { return function() { choixIndex = idx; renderChoixCard(); renderChoixDots(); }; })(i);
+      dots.appendChild(d);
+    }
+  }
+
+  function choixGo(dir) {
+    choixIndex = Math.max(0, Math.min(2, choixIndex + dir));
+    renderChoixCard();
+    renderChoixDots();
+  }
+
+  function choixNext() {
+    // Clic sur la carte : passe à la suivante (ou revient à la première)
+    choixIndex = (choixIndex + 1) % 3;
+    renderChoixCard();
+    renderChoixDots();
+  }
+
+  function choixChoisir() {
+    const task = choixCards[choixIndex];
+    document.getElementById('chosen-task').innerHTML = parseRandom(task.t);
+    const vsep = document.getElementById('chosen-vsep');
+    const vd   = document.getElementById('chosen-variant');
+    if (task.v) { vd.innerHTML = parseRandom(task.v); vd.style.display = 'block'; vsep.style.display = 'block'; }
+    else { vd.style.display = 'none'; vsep.style.display = 'none'; }
+    const isep = document.getElementById('chosen-isep');
+    const id   = document.getElementById('chosen-infernal');
+    if (task.h) { id.innerHTML = task.h; id.style.display = 'block'; isep.style.display = 'block'; }
+    else { id.style.display = 'none'; isep.style.display = 'none'; }
+    document.getElementById('choix-picker').style.display = 'none';
+    document.getElementById('choix-chosen-panel').classList.add('visible');
+  }
+
   // ─── MODE SCÉNARIO — SÉLECTION ──────────────────────────────────────────────
 
   let selectedIndices = [];
@@ -1211,7 +1449,6 @@
       t.onclick = () => { runIndex = pos; renderRunCard(); };
       thumbs.appendChild(t);
     });
-    // scroll active thumb into view
     const activeThumb = thumbs.children[runIndex];
     if (activeThumb) activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   }
@@ -1262,16 +1499,19 @@
 
   function setMode(mode) {
     const tirage   = document.getElementById('tirage-panel');
+    const choix    = document.getElementById('choix-panel');
     const browse   = document.getElementById('browse-panel');
     const scenario = document.getElementById('scenario-panel');
-    ['tirage','browse','scenario'].forEach(m => {
+    ['tirage','choix','browse','scenario'].forEach(m => {
       document.getElementById('btn-' + m).classList.remove('active');
     });
     document.getElementById('btn-' + mode).classList.add('active');
     tirage.style.display   = mode === 'tirage'   ? 'flex' : 'none';
+    choix.classList.toggle('visible', mode === 'choix');
     browse.classList.toggle('visible', mode === 'browse');
     scenario.classList.toggle('visible', mode === 'scenario');
     if (mode === 'browse') showBrowseCard();
+    if (mode === 'choix' && choixCards.length === 0) initChoix();
   }
 
   // ─── INIT ───────────────────────────────────────────────────────────────────
